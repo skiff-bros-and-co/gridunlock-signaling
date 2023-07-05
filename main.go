@@ -1,13 +1,15 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
+	"sync/atomic"
 
-	"github.com/gorilla/websocket"
+	"github.com/olahol/melody"
 	cmap "github.com/orcaman/concurrent-map/v2"
 )
 
@@ -20,47 +22,9 @@ type Message struct {
 
 const MAX_MESSAGE_BYTES = 1024
 
-var PONG_MESSAGE = Message{
-	Type: "pong",
-}
+var PONG_MESSAGE = []byte("{\"type\":\"pong\"}")
 
-var upgrader = websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool {
-		origin := r.Header.Get("Origin")
-		if origin == "" {
-			log.Println("Received empty origin")
-			return false
-		}
-
-		// local dev builds
-		if origin == " http://localhost:5173/" {
-			return true
-		}
-
-		parsedOrigin, err := url.Parse(origin)
-		if err != nil {
-			log.Println("Received invalid origin:", origin)
-			return false
-		}
-
-		if parsedOrigin.Scheme != "https" {
-			log.Println("Received invalid origin:", origin)
-			return false
-		}
-
-		if parsedOrigin.Hostname() == "gridunlockapp.com" {
-			return true
-		}
-
-		// Dev builds
-		if strings.HasSuffix(parsedOrigin.Hostname(), ".gridunlock-org.pages.dev") {
-			return true
-		}
-
-		log.Println("Received invalid origin:", origin)
-		return false
-	},
-}
+var clientIdCounter uint64 = 0
 
 func main() {
 	buildType := os.Getenv("BUILD_TYPE")
@@ -75,85 +39,118 @@ func main() {
 
 	log.Println("Server started at http://localhost:8080")
 
-	subscribers := cmap.New[[]*websocket.Conn]()
+	m := melody.New()
+	m.Config.MaxMessageSize = MAX_MESSAGE_BYTES
+	m.Upgrader.CheckOrigin = validateOrigin
 
 	http.HandleFunc("/signaling", func(w http.ResponseWriter, r *http.Request) {
-		conn, err := upgrader.Upgrade(w, r, nil)
-		if err != nil {
-			log.Print("upgrade failed: ", err)
+		m.HandleRequest(w, r)
+	})
+
+	m.HandleConnect(func(s *melody.Session) {
+		id := atomic.AddUint64(&clientIdCounter, 1)
+		s.Set("id", id)
+		log.Println("client connected:", id)
+	})
+
+	subscribers := cmap.New[[]*melody.Session]()
+	m.HandleClose(func(s *melody.Session, i int, s2 string) error {
+		id, idWasSet := s.Get("id")
+		var idLogString string
+		if idWasSet {
+			log.Println("client disconnected:", id)
+			idLogString = "(clientId:" + id.(string) + ")"
+		} else {
+			log.Println("client disconnected: unknown id")
+			idLogString = "(unknownId)"
+		}
+
+		topic, topicWasSet := s.Get("topic")
+		if topicWasSet {
+			removeSubscriber(&subscribers, topic.(string), s, idLogString)
+		}
+
+		return nil
+	})
+
+	m.HandleMessage(func(s *melody.Session, msg []byte) {
+		id, idWasSet := s.Get("id")
+		if !idWasSet {
+			log.Println("received message from unknown client")
 			return
 		}
-		defer conn.Close()
+		idLogString := "(clientId:" + id.(string) + ")"
 
-		// Clear any subscriptions on disconnect
-		defer func() {
-			for _, topic := range subscribers.Keys() {
-				removeSubscriber(&subscribers, topic, conn)
-			}
-		}()
+		var receivedMessage Message
+		err := json.Unmarshal(msg, &receivedMessage)
+		if err != nil {
+			log.Println("received invalid message:", string(msg), idLogString)
+			return
+		}
 
-		conn.SetReadLimit(MAX_MESSAGE_BYTES)
-		messageLoop(conn, &subscribers)
+		processMessage(&subscribers, s, receivedMessage, msg, idLogString)
 	})
 
 	log.Fatal(http.ListenAndServe(addr, nil))
 }
 
-func messageLoop(conn *websocket.Conn, subscribers *cmap.ConcurrentMap[string, []*websocket.Conn]) {
-	receivedMessage := Message{}
+func processMessage(subscribers *cmap.ConcurrentMap[string, []*melody.Session], s *melody.Session, msg Message, rawMsg []byte, idLogString string) {
+	existingTopic, topicWasSet := s.Get("topic")
 
-	for {
-		err := conn.ReadJSON(&receivedMessage)
+	switch msg.Type {
+	case "ping":
+		err := s.Write(PONG_MESSAGE)
 		if err != nil {
-			if err == websocket.ErrCloseSent {
-				log.Println("connection closed by client")
+			log.Println("write failed:", err, idLogString)
+			return
+		}
+	case "subscribe":
+		if msg.Topics == nil || len(msg.Topics) != 1 {
+			log.Println("received invalid subscribe message", msg, idLogString)
+			return
+		}
+		if topicWasSet {
+			if existingTopic.(string) == msg.Topics[0] {
+				log.Println("received duplicate subscribe message", msg, idLogString)
+				return
 			} else {
-				log.Println("read failed:", err)
+				log.Println("attempted to subscribe to multiple topics", msg, existingTopic, idLogString)
+				return
 			}
+		}
+		addSubscriber(subscribers, msg.Topics[0], s, idLogString)
+	case "unsubscribe":
+		removeSubscriber(subscribers, msg.Topics[0], s, idLogString)
+	case "publish":
+		if msg.Topic == "" || msg.Data == nil {
+			log.Println("received invalid publish message", msg, idLogString)
+			return
+		}
+		if msg.Topic != existingTopic {
+			log.Println("received publish message for non-subscribed topic", msg, idLogString)
 			return
 		}
 
-		switch receivedMessage.Type {
-		case "ping":
-			err := conn.WriteJSON(&PONG_MESSAGE)
-			if err != nil {
-				log.Println("write failed:", err)
-				return
+		peers, exists := subscribers.Get(msg.Topic)
+		if !exists {
+			log.Println("received publish message for non-existent topic", msg, idLogString)
+			return
+		}
+		for _, peer := range peers {
+			if peer == s {
+				continue
 			}
-		case "subscribe":
-			if receivedMessage.Topics == nil || len(receivedMessage.Topics) != 1 {
-				log.Println("received invalid subscribe message", receivedMessage)
-				return
-			}
-			addSubscriber(subscribers, receivedMessage.Topics[0], conn)
-		case "unsubscribe":
-			removeSubscriber(subscribers, receivedMessage.Topics[0], conn)
-		case "publish":
-			if receivedMessage.Topic == "" || receivedMessage.Data == nil {
-				log.Println("received invalid publish message", receivedMessage)
-				return
-			}
-			peers, exists := subscribers.Get(receivedMessage.Topic)
-			if !exists {
-				log.Println("received publish message for non-existent topic", receivedMessage)
-				return
-			}
-			for _, peer := range peers {
-				if peer == conn {
-					continue
-				}
 
-				err := peer.WriteJSON(&receivedMessage)
-				if err != nil {
-					log.Println("write to peer failed:", err)
-				}
+			err := peer.Write(rawMsg)
+			if err != nil {
+				log.Println("write to peer failed:", err, idLogString)
 			}
 		}
 	}
 }
 
-func removeSubscriber(subscribers *cmap.ConcurrentMap[string, []*websocket.Conn], topic string, conn *websocket.Conn) {
-	subscribers.Upsert(topic, []*websocket.Conn{}, func(exists bool, valueInMap []*websocket.Conn, newValue []*websocket.Conn) []*websocket.Conn {
+func removeSubscriber(subscribers *cmap.ConcurrentMap[string, []*melody.Session], topic string, conn *melody.Session, logSuffix string) {
+	subscribers.Upsert(topic, []*melody.Session{}, func(exists bool, valueInMap []*melody.Session, newValue []*melody.Session) []*melody.Session {
 		if exists {
 			for i, subscriber := range valueInMap {
 				if subscriber == conn {
@@ -163,20 +160,20 @@ func removeSubscriber(subscribers *cmap.ConcurrentMap[string, []*websocket.Conn]
 		}
 		return valueInMap
 	})
-	log.Println("removed subscriber from topic", topic)
+	log.Println("removed subscriber from topic", topic, logSuffix)
 
 	// Remove topic if no subscribers
-	removedTopic := subscribers.RemoveCb(topic, func(_ string, valueInMap []*websocket.Conn, exists bool) bool {
+	removedTopic := subscribers.RemoveCb(topic, func(_ string, valueInMap []*melody.Session, exists bool) bool {
 		return exists && len(valueInMap) == 0
 	})
 
 	if removedTopic {
-		log.Println("cleaned up topic", topic)
+		log.Println("cleaned up topic", topic, logSuffix)
 	}
 }
 
-func addSubscriber(subscribers *cmap.ConcurrentMap[string, []*websocket.Conn], topic string, conn *websocket.Conn) {
-	subscribers.Upsert(topic, []*websocket.Conn{conn}, func(exists bool, valueInMap []*websocket.Conn, newValue []*websocket.Conn) []*websocket.Conn {
+func addSubscriber(subscribers *cmap.ConcurrentMap[string, []*melody.Session], topic string, conn *melody.Session, logSuffix string) {
+	subscribers.Upsert(topic, []*melody.Session{conn}, func(exists bool, valueInMap []*melody.Session, newValue []*melody.Session) []*melody.Session {
 		if exists {
 			// Avoid duplicate subscribers
 			for _, subscriber := range valueInMap {
@@ -190,5 +187,41 @@ func addSubscriber(subscribers *cmap.ConcurrentMap[string, []*websocket.Conn], t
 			return newValue
 		}
 	})
-	log.Println("added subscriber to topic", topic)
+	log.Println("added subscriber to topic", topic, logSuffix)
+}
+
+func validateOrigin(r *http.Request) bool {
+	origin := r.Header.Get("Origin")
+	if origin == "" {
+		log.Println("received empty origin")
+		return false
+	}
+
+	// local dev builds
+	if origin == " http://localhost:5173/" {
+		return true
+	}
+
+	parsedOrigin, err := url.Parse(origin)
+	if err != nil {
+		log.Println("Received invalid origin:", origin)
+		return false
+	}
+
+	if parsedOrigin.Scheme != "https" {
+		log.Println("Received invalid origin:", origin)
+		return false
+	}
+
+	if parsedOrigin.Hostname() == "gridunlockapp.com" {
+		return true
+	}
+
+	// Dev builds
+	if strings.HasSuffix(parsedOrigin.Hostname(), ".gridunlock-org.pages.dev") {
+		return true
+	}
+
+	log.Println("Received invalid origin:", origin)
+	return false
 }
