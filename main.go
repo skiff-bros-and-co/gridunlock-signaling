@@ -79,24 +79,26 @@ func main() {
 
 		conn.SetReadLimit(MAX_MESSAGE_BYTES)
 
-		var receivedMessage Message
-
+	MessageLoop:
 		for {
-			err := conn.ReadJSON(receivedMessage)
+			receivedMessage := Message{}
+			err := conn.ReadJSON(&receivedMessage)
 			if err != nil {
 				log.Println("read failed:", err)
-				break
+				break MessageLoop
 			}
 
-			if receivedMessage.Type == "ping" {
-				var messageToSend Message = Message{
+			switch receivedMessage.Type {
+			case "ping":
+				messageToSend := Message{
 					Type: "pong",
 				}
-				err := conn.WriteJSON(messageToSend)
+				err := conn.WriteJSON(&messageToSend)
 				if err != nil {
 					log.Println("write failed:", err)
-					break
+					break MessageLoop
 				}
+
 			}
 		}
 	})
