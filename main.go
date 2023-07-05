@@ -16,6 +16,7 @@ const MAX_MESSAGE_BYTES = 1024
 type Message struct {
 	Type   string                 `json:"type"`
 	Topics []string               `json:"topics,omitempty"`
+	Topic  string                 `json:"topic,omitempty"`
 	Data   map[string]interface{} `json:"data,omitempty"`
 }
 
@@ -122,11 +123,11 @@ func messageLoop(conn *websocket.Conn, subscribers *cmap.ConcurrentMap[string, [
 		case "unsubscribe":
 			removeSubscriber(subscribers, receivedMessage.Topics[0], conn)
 		case "publish":
-			if receivedMessage.Topics == nil || len(receivedMessage.Topics) != 1 {
+			if receivedMessage.Topic == "" || receivedMessage.Data == nil {
 				log.Println("received invalid publish message", receivedMessage)
 				return
 			}
-			peers, exists := subscribers.Get(receivedMessage.Topics[0])
+			peers, exists := subscribers.Get(receivedMessage.Topic)
 			if !exists {
 				log.Println("received publish message for non-existent topic", receivedMessage)
 				return
@@ -156,11 +157,16 @@ func removeSubscriber(subscribers *cmap.ConcurrentMap[string, []*websocket.Conn]
 		}
 		return valueInMap
 	})
+	log.Println("Removed subscriber from topic", topic)
 
 	// Remove topic if no subscribers
-	subscribers.RemoveCb(topic, func(_ string, valueInMap []*websocket.Conn, exists bool) bool {
+	removedTopic := subscribers.RemoveCb(topic, func(_ string, valueInMap []*websocket.Conn, exists bool) bool {
 		return exists && len(valueInMap) == 0
 	})
+
+	if removedTopic {
+		log.Println("Cleaned up topic", topic)
+	}
 }
 
 func addSubscriber(subscribers *cmap.ConcurrentMap[string, []*websocket.Conn], topic string, conn *websocket.Conn) {
@@ -171,4 +177,5 @@ func addSubscriber(subscribers *cmap.ConcurrentMap[string, []*websocket.Conn], t
 			return newValue
 		}
 	})
+	log.Println("Added subscriber to topic", topic)
 }
