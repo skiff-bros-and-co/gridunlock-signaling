@@ -3,9 +3,24 @@ package main
 import (
 	"net/http"
 	"testing"
+
+	"github.com/olahol/melody"
+	cmap "github.com/orcaman/concurrent-map/v2"
 )
 
-// Path: main_test.go
+func TestAddSubscriber(t *testing.T) {
+	subscribers := cmap.New[[]*melody.Session]()
+	s := &melody.Session{}
+	addSubscriber(&subscribers, "test", s, "test-client")
+
+	topic, _ := subscribers.Get("test")
+	if len(topic) != 1 {
+		t.Error("Subscriber was not added")
+	}
+	if topic[0] != s {
+		t.Error("Incorrect subscriber was added")
+	}
+}
 
 // Test origin validation
 func TestValidateOrigin(t *testing.T) {
