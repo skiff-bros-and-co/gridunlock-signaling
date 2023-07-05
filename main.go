@@ -120,8 +120,10 @@ func processMessage(subscribers *cmap.ConcurrentMap[string, []*melody.Session], 
 				return
 			}
 		}
+		s.Set("topic", msg.Topics[0])
 		addSubscriber(subscribers, msg.Topics[0], s, idLogString)
 	case "unsubscribe":
+		s.UnSet("topic")
 		removeSubscriber(subscribers, msg.Topics[0], s, idLogString)
 	case "publish":
 		if msg.Topic == "" || msg.Data == nil {
@@ -162,6 +164,7 @@ func removeSubscriber(subscribers *cmap.ConcurrentMap[string, []*melody.Session]
 		}
 		return valueInMap
 	})
+
 	log.Println("removed subscriber from topic", topic, logSuffix)
 
 	// Remove topic if no subscribers
