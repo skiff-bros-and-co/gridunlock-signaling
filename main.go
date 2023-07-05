@@ -9,8 +9,16 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+type Message struct {
+	Type   string   `json:"type"`
+	Topics []string `json:"topics,omitempty"`
+	Data   string   `json:"data,omitempty"`
+}
+
 var upgrader = websocket.Upgrader{}
 var todoList []string
+
+const MAX_MESSAGE_BYTES = 1024
 
 func getCmd(input string) string {
 	inputArr := strings.Split(input, " ")
@@ -86,6 +94,38 @@ func main() {
 			if err != nil {
 				log.Println("write failed:", err)
 				break
+			}
+		}
+	})
+
+	http.HandleFunc("/signaling", func(w http.ResponseWriter, r *http.Request) {
+		conn, err := upgrader.Upgrade(w, r, nil)
+		if err != nil {
+			log.Print("upgrade failed: ", err)
+			return
+		}
+		defer conn.Close()
+
+		conn.SetReadLimit(MAX_MESSAGE_BYTES)
+
+		var receivedMessage Message
+
+		for {
+			err := conn.ReadJSON(receivedMessage)
+			if err != nil {
+				log.Println("read failed:", err)
+				break
+			}
+
+			if receivedMessage.Type == "ping" {
+				var messageToSend Message = Message{
+					Type: "pong",
+				}
+				err := conn.WriteJSON(messageToSend)
+				if err != nil {
+					log.Println("write failed:", err)
+					break
+				}
 			}
 		}
 	})
