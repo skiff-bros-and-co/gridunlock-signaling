@@ -13,9 +13,9 @@ import (
 const MAX_MESSAGE_BYTES = 1024
 
 type Message struct {
-	Type   string   `json:"type"`
-	Topics []string `json:"topics,omitempty"`
-	Data   string   `json:"data,omitempty"`
+	Type   string                 `json:"type"`
+	Topics []string               `json:"topics,omitempty"`
+	Data   map[string]interface{} `json:"data,omitempty"`
 }
 
 var upgrader = websocket.Upgrader{
