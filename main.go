@@ -204,7 +204,7 @@ func validateOrigin(r *http.Request) bool {
 	}
 
 	// local dev builds
-	if origin == " http://localhost:5173/" {
+	if origin == "http://localhost:5173" {
 		return true
 	}
 
