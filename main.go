@@ -157,7 +157,7 @@ func removeSubscriber(subscribers *cmap.ConcurrentMap[string, []*websocket.Conn]
 		}
 		return valueInMap
 	})
-	log.Println("Removed subscriber from topic", topic)
+	log.Println("removed subscriber from topic", topic)
 
 	// Remove topic if no subscribers
 	removedTopic := subscribers.RemoveCb(topic, func(_ string, valueInMap []*websocket.Conn, exists bool) bool {
@@ -165,17 +165,24 @@ func removeSubscriber(subscribers *cmap.ConcurrentMap[string, []*websocket.Conn]
 	})
 
 	if removedTopic {
-		log.Println("Cleaned up topic", topic)
+		log.Println("cleaned up topic", topic)
 	}
 }
 
 func addSubscriber(subscribers *cmap.ConcurrentMap[string, []*websocket.Conn], topic string, conn *websocket.Conn) {
 	subscribers.Upsert(topic, []*websocket.Conn{conn}, func(exists bool, valueInMap []*websocket.Conn, newValue []*websocket.Conn) []*websocket.Conn {
 		if exists {
+			// Avoid duplicate subscribers
+			for _, subscriber := range valueInMap {
+				if subscriber == conn {
+					return valueInMap
+				}
+			}
+
 			return append(valueInMap, conn)
 		} else {
 			return newValue
 		}
 	})
-	log.Println("Added subscriber to topic", topic)
+	log.Println("added subscriber to topic", topic)
 }
