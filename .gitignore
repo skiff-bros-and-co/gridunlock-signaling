@@ -19,3 +19,8 @@
 
 # Go workspace file
 go.work
+
+# Devenv
+.devenv*
+devenv.local.nix
+.direnv
