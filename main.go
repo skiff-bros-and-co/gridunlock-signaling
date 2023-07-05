@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/gorilla/websocket"
+	cmap "github.com/orcaman/concurrent-map/v2"
 )
 
 const MAX_MESSAGE_BYTES = 1024
@@ -69,6 +70,8 @@ func main() {
 
 	log.Println("Server started at http://localhost:8080")
 
+	subscribers := cmap.New[[]*websocket.Conn]()
+
 	http.HandleFunc("/signaling", func(w http.ResponseWriter, r *http.Request) {
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
@@ -77,31 +80,95 @@ func main() {
 		}
 		defer conn.Close()
 
+		// Clear any subscriptions on disconnect
+		defer func() {
+			for _, topic := range subscribers.Keys() {
+				removeSubscriber(&subscribers, topic, conn)
+			}
+		}()
+
 		conn.SetReadLimit(MAX_MESSAGE_BYTES)
-
-	MessageLoop:
-		for {
-			receivedMessage := Message{}
-			err := conn.ReadJSON(&receivedMessage)
-			if err != nil {
-				log.Println("read failed:", err)
-				break MessageLoop
-			}
-
-			switch receivedMessage.Type {
-			case "ping":
-				messageToSend := Message{
-					Type: "pong",
-				}
-				err := conn.WriteJSON(&messageToSend)
-				if err != nil {
-					log.Println("write failed:", err)
-					break MessageLoop
-				}
-
-			}
-		}
+		messageLoop(conn, &subscribers)
 	})
 
 	log.Fatal(http.ListenAndServe(addr, nil))
+}
+
+func messageLoop(conn *websocket.Conn, subscribers *cmap.ConcurrentMap[string, []*websocket.Conn]) {
+	for {
+		receivedMessage := Message{}
+		err := conn.ReadJSON(&receivedMessage)
+		if err != nil {
+			log.Println("read failed:", err)
+			return
+		}
+
+		switch receivedMessage.Type {
+		case "ping":
+			messageToSend := Message{
+				Type: "pong",
+			}
+			err := conn.WriteJSON(&messageToSend)
+			if err != nil {
+				log.Println("write failed:", err)
+				return
+			}
+		case "subscribe":
+			if receivedMessage.Topics == nil || len(receivedMessage.Topics) != 1 {
+				log.Println("received invalid subscribe message", receivedMessage)
+				return
+			}
+			addSubscriber(subscribers, receivedMessage.Topics[0], conn)
+		case "unsubscribe":
+			removeSubscriber(subscribers, receivedMessage.Topics[0], conn)
+		case "publish":
+			if receivedMessage.Topics == nil || len(receivedMessage.Topics) != 1 {
+				log.Println("received invalid publish message", receivedMessage)
+				return
+			}
+			peers, exists := subscribers.Get(receivedMessage.Topics[0])
+			if !exists {
+				log.Println("received publish message for non-existent topic", receivedMessage)
+				return
+			}
+			for _, peer := range peers {
+				if peer == conn {
+					continue
+				}
+
+				err := peer.WriteJSON(&receivedMessage)
+				if err != nil {
+					log.Println("write to peer failed:", err)
+				}
+			}
+		}
+	}
+}
+
+func removeSubscriber(subscribers *cmap.ConcurrentMap[string, []*websocket.Conn], topic string, conn *websocket.Conn) {
+	subscribers.Upsert(topic, []*websocket.Conn{}, func(exists bool, valueInMap []*websocket.Conn, newValue []*websocket.Conn) []*websocket.Conn {
+		if exists {
+			for i, subscriber := range valueInMap {
+				if subscriber == conn {
+					return append(valueInMap[:i], valueInMap[i+1:]...)
+				}
+			}
+		}
+		return valueInMap
+	})
+
+	// Remove topic if no subscribers
+	subscribers.RemoveCb(topic, func(_ string, valueInMap []*websocket.Conn, exists bool) bool {
+		return exists && len(valueInMap) == 0
+	})
+}
+
+func addSubscriber(subscribers *cmap.ConcurrentMap[string, []*websocket.Conn], topic string, conn *websocket.Conn) {
+	subscribers.Upsert(topic, []*websocket.Conn{conn}, func(exists bool, valueInMap []*websocket.Conn, newValue []*websocket.Conn) []*websocket.Conn {
+		if exists {
+			return append(valueInMap, conn)
+		} else {
+			return newValue
+		}
+	})
 }
