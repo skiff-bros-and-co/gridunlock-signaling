@@ -174,6 +174,7 @@ func removeSubscriber(subscribers *cmap.ConcurrentMap[string, []*melody.Session]
 
 	if removedTopic {
 		log.Println("cleaned up topic", topic, logSuffix)
+		log.Println("topic count:", subscribers.Count())
 	}
 }
 
