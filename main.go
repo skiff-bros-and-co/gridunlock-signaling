@@ -59,6 +59,8 @@ func main() {
 		}
 		defer conn.Close()
 
+		conn.SetReadLimit(1024)
+
 		// Continuosly read and write message
 		for {
 			mt, message, err := conn.ReadMessage()
