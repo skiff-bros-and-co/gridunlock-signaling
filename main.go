@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"sync/atomic"
 
@@ -49,7 +50,7 @@ func main() {
 
 	m.HandleConnect(func(s *melody.Session) {
 		id := atomic.AddUint64(&clientIdCounter, 1)
-		s.Set("id", id)
+		s.Set("id", strconv.FormatUint(id, 10))
 		log.Println("client connected:", id)
 	})
 
