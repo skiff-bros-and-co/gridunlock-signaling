@@ -11,13 +11,17 @@ import (
 	cmap "github.com/orcaman/concurrent-map/v2"
 )
 
-const MAX_MESSAGE_BYTES = 1024
-
 type Message struct {
 	Type   string                 `json:"type"`
 	Topics []string               `json:"topics,omitempty"`
 	Topic  string                 `json:"topic,omitempty"`
 	Data   map[string]interface{} `json:"data,omitempty"`
+}
+
+const MAX_MESSAGE_BYTES = 1024
+
+var PONG_MESSAGE = Message{
+	Type: "pong",
 }
 
 var upgrader = websocket.Upgrader{
@@ -96,20 +100,22 @@ func main() {
 }
 
 func messageLoop(conn *websocket.Conn, subscribers *cmap.ConcurrentMap[string, []*websocket.Conn]) {
+	receivedMessage := Message{}
+
 	for {
-		receivedMessage := Message{}
 		err := conn.ReadJSON(&receivedMessage)
 		if err != nil {
-			log.Println("read failed:", err)
+			if err == websocket.ErrCloseSent {
+				log.Println("connection closed by client")
+			} else {
+				log.Println("read failed:", err)
+			}
 			return
 		}
 
 		switch receivedMessage.Type {
 		case "ping":
-			messageToSend := Message{
-				Type: "pong",
-			}
-			err := conn.WriteJSON(&messageToSend)
+			err := conn.WriteJSON(&PONG_MESSAGE)
 			if err != nil {
 				log.Println("write failed:", err)
 				return
