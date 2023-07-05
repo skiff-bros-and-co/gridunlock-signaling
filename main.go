@@ -50,8 +50,9 @@ func main() {
 
 	m.HandleConnect(func(s *melody.Session) {
 		id := atomic.AddUint64(&clientIdCounter, 1)
-		s.Set("id", strconv.FormatUint(id, 10))
-		log.Println("client connected:", id)
+		idString := strconv.FormatUint(id, 10)
+		s.Set("id", idString)
+		log.Println("client connected:", idString)
 	})
 
 	subscribers := cmap.New[[]*melody.Session]()
