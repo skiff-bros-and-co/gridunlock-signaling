@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/gorilla/websocket"
@@ -37,6 +38,18 @@ func updateTodoList(input string) {
 }
 
 func main() {
+	buildType := os.Getenv("BUILD_TYPE")
+	var addr string
+	if buildType == "DEV" {
+		addr = "127.0.0.1:8080"
+		log.Println("Running in DEV mode")
+	} else {
+		addr = ":8080"
+		log.Println("Running in PROD mode")
+	}
+
+	log.Println("Server started at http://localhost:8080")
+
 	http.HandleFunc("/todo", func(w http.ResponseWriter, r *http.Request) {
 		// Upgrade upgrades the HTTP server connection to the WebSocket protocol.
 		conn, err := upgrader.Upgrade(w, r, nil)
@@ -79,5 +92,5 @@ func main() {
 		http.ServeFile(w, r, "websockets.html")
 	})
 
-	http.ListenAndServe(":8080", nil)
+	log.Fatal(http.ListenAndServe(addr, nil))
 }
