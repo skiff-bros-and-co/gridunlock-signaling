@@ -48,6 +48,10 @@ func main() {
 		m.HandleRequest(w, r)
 	})
 
+	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
 	m.HandleConnect(func(s *melody.Session) {
 		id := atomic.AddUint64(&clientIdCounter, 1)
 		idString := strconv.FormatUint(id, 10)
