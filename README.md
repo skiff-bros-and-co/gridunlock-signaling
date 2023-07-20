@@ -1,2 +1,2 @@
 # gridunlock-signaling
-A simple signaling server.
+A simple signaling server in go.
