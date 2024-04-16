@@ -13,5 +13,8 @@ jobs:
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
 
       - uses: ko-build/setup-ko@ace48d793556083a76f1e3e6068850c1f4a369aa # v0.6
-      - run: ko build
-            
+
+      - run: ko build . --bare
+        env:
+          GOFLAGS: -ldflags=-X=main.Version=${{ github.sha }}
+          KO_DOCKER_REPO: ghcr.io/skiff-bros-and-co/gridunlock-signaling
