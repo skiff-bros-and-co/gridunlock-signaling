@@ -1,0 +1,17 @@
+name: publish
+
+on: 
+  push:
+    branches: [main]
+
+jobs:
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+
+      - uses: ko-build/setup-ko@v0.6
+      - run: ko build
+            

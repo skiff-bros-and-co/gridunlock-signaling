@@ -5,11 +5,12 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"strconv"
 	"strings"
 	"sync/atomic"
 
+	chi "github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"github.com/olahol/melody"
 	cmap "github.com/orcaman/concurrent-map/v2"
 )
@@ -27,18 +28,20 @@ var PONG_MESSAGE = []byte("{\"type\":\"pong\"}")
 
 var clientIdCounter uint64 = 0
 
+var Version string = "development"
+
 func main() {
-	buildType := os.Getenv("BUILD_TYPE")
 	var addr string
-	if buildType == "DEV" {
-		addr = "127.0.0.1:8080"
+	if Version == "development" {
+		addr = "127.0.0.1"
 		log.Println("Running in DEV mode")
 	} else {
-		addr = ":8080"
+		addr = ""
 		log.Println("Running in PROD mode")
 	}
-
 	log.Println("Server started at http://localhost:8080")
+
+	mountAdmin(addr + ":8081")
 
 	m := melody.New()
 	m.Config.MaxMessageSize = MAX_MESSAGE_BYTES
@@ -46,10 +49,6 @@ func main() {
 
 	http.HandleFunc("/signaling", func(w http.ResponseWriter, r *http.Request) {
 		m.HandleRequest(w, r)
-	})
-
-	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
 	})
 
 	m.HandleConnect(func(s *melody.Session) {
@@ -97,7 +96,22 @@ func main() {
 		processMessage(&subscribers, s, receivedMessage, msg, idLogString)
 	})
 
-	log.Fatal(http.ListenAndServe(addr, nil))
+	log.Fatal(http.ListenAndServe(addr+":8080", nil))
+}
+
+func mountAdmin(addr string) {
+	go func() {
+		router := chi.NewRouter()
+		router.Use(middleware.RequestID)
+		router.Use(middleware.RealIP)
+		router.Use(middleware.Recoverer)
+
+		router.Get("/health", func(w http.ResponseWriter, r *http.Request) {
+			_, _ = w.Write([]byte("ok"))
+		})
+
+		log.Fatal(http.ListenAndServe(addr, router))
+	}()
 }
 
 func processMessage(subscribers *cmap.ConcurrentMap[string, []*melody.Session], s *melody.Session, msg Message, rawMsg []byte, idLogString string) {

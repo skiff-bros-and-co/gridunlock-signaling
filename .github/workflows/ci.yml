@@ -1,0 +1,17 @@
+name: ci
+
+on: [push]
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+
+      - name: Build
+        run: go build -ldflags "-X main.Version=test" -v .
+
+      - name: Test
+        run: go test -v ./...

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.10.5/.schema/devbox.schema.json",
+  "packages": [
+    "reflex@latest",
+    "ko@latest",
+    "go@latest"
+  ],
+  "shell": {
+    "init_hook": [
+      
+    ],
+    "scripts": {
+      "watch": [
+        "export BUILD_TYPE=DEV",
+        "reflex -r '\\.go$' -s -- sh -c 'go run .'"
+      ]
+    }
+  }
+}
