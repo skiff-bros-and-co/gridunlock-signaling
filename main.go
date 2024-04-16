@@ -9,8 +9,8 @@ import (
 	"strings"
 	"sync/atomic"
 
-	chi "github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
+	chi "github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/olahol/melody"
 	cmap "github.com/orcaman/concurrent-map/v2"
 )
