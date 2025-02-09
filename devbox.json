@@ -3,7 +3,7 @@
   "packages": [
     "reflex@latest",
     "ko@latest",
-    "go@latest"
+    "go@1.23.5"
   ],
   "shell": {
     "init_hook": [
