@@ -12,7 +12,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
-      - uses: ko-build/setup-ko@d982fec422852203cfb2053a8ec6ad302280d04d # v0.8
+      - uses: ko-build/setup-ko@d006021bd0c28d1ce33a07e7943d48b079944c8d # v0.9
 
       - run: ko build . --bare
         env:
