@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.10.5/.schema/devbox.schema.json",
   "packages": [
     "reflex@latest",
-    "ko@latest",
+    "ko@0.17.1",
     "go@1.23.5"
   ],
   "shell": {
