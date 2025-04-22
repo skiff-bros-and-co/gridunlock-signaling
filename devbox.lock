@@ -97,9 +97,9 @@
         }
       }
     },
-    "reflex@latest": {
-      "last_modified": "2024-03-22T11:26:23Z",
-      "resolved": "github:NixOS/nixpkgs/a3ed7406349a9335cb4c2a71369b697cecd9d351#reflex",
+    "reflex@0.3.1": {
+      "last_modified": "2025-03-11T17:52:14Z",
+      "resolved": "github:NixOS/nixpkgs/0d534853a55b5d02a4ababa1d71921ce8f0aee4c#reflex",
       "source": "devbox-search",
       "version": "0.3.1",
       "systems": {
@@ -107,41 +107,41 @@
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/h25gs269ffqbb1qbaqd43zsznhndvhgc-reflex-0.3.1",
+              "path": "/nix/store/qv7gw803j45110130p7plrhqkd4s7s54-reflex-0.3.1",
               "default": true
             }
           ],
-          "store_path": "/nix/store/h25gs269ffqbb1qbaqd43zsznhndvhgc-reflex-0.3.1"
+          "store_path": "/nix/store/qv7gw803j45110130p7plrhqkd4s7s54-reflex-0.3.1"
         },
         "aarch64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/4bm6nf2yyvg6jkbpsw86r50yr5nldz52-reflex-0.3.1",
+              "path": "/nix/store/1f7648nkn3380dncjnfk4x41m2y6a318-reflex-0.3.1",
               "default": true
             }
           ],
-          "store_path": "/nix/store/4bm6nf2yyvg6jkbpsw86r50yr5nldz52-reflex-0.3.1"
+          "store_path": "/nix/store/1f7648nkn3380dncjnfk4x41m2y6a318-reflex-0.3.1"
         },
         "x86_64-darwin": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/s477vbnky02i0i22wrh9gfjbzmj389y3-reflex-0.3.1",
+              "path": "/nix/store/zxy264z3d0xzardqmcnc60hzv4f6zl2l-reflex-0.3.1",
               "default": true
             }
           ],
-          "store_path": "/nix/store/s477vbnky02i0i22wrh9gfjbzmj389y3-reflex-0.3.1"
+          "store_path": "/nix/store/zxy264z3d0xzardqmcnc60hzv4f6zl2l-reflex-0.3.1"
         },
         "x86_64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/qbwvhh0kn3s0rx00wd7lhlxjf39qxqp5-reflex-0.3.1",
+              "path": "/nix/store/qhpvl1l2l94y435gfpfiqsapx525bqhg-reflex-0.3.1",
               "default": true
             }
           ],
-          "store_path": "/nix/store/qbwvhh0kn3s0rx00wd7lhlxjf39qxqp5-reflex-0.3.1"
+          "store_path": "/nix/store/qhpvl1l2l94y435gfpfiqsapx525bqhg-reflex-0.3.1"
         }
       }
     }
