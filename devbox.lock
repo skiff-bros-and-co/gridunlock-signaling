@@ -49,51 +49,51 @@
         }
       }
     },
-    "ko@0.17.1": {
-      "last_modified": "2025-04-02T04:26:43Z",
-      "resolved": "github:NixOS/nixpkgs/b7ba7f9f45c5cd0d8625e9e217c28f8eb6a19a76#ko",
+    "ko@0.18.0": {
+      "last_modified": "2025-05-15T12:36:28Z",
+      "resolved": "github:NixOS/nixpkgs/b1bebd0fe266bbd1820019612ead889e96a8fa2d#ko",
       "source": "devbox-search",
-      "version": "0.17.1",
+      "version": "0.18.0",
       "systems": {
         "aarch64-darwin": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/h186jbqpfn0g59n7x9kyza6zcf4ywzh9-ko-0.17.1",
+              "path": "/nix/store/4qz9dndvh4mh13dx9z4hh69rv4pi0may-ko-0.18.0",
               "default": true
             }
           ],
-          "store_path": "/nix/store/h186jbqpfn0g59n7x9kyza6zcf4ywzh9-ko-0.17.1"
+          "store_path": "/nix/store/4qz9dndvh4mh13dx9z4hh69rv4pi0may-ko-0.18.0"
         },
         "aarch64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/8y4y6q15f82x9lww399np5gilsblwr2i-ko-0.17.1",
+              "path": "/nix/store/nlz4gzfjv243id2fnw8izfgb8m18pr8n-ko-0.18.0",
               "default": true
             }
           ],
-          "store_path": "/nix/store/8y4y6q15f82x9lww399np5gilsblwr2i-ko-0.17.1"
+          "store_path": "/nix/store/nlz4gzfjv243id2fnw8izfgb8m18pr8n-ko-0.18.0"
         },
         "x86_64-darwin": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/zmigwvsdw2lnj8xzw9pk4szrs4cy0cb5-ko-0.17.1",
+              "path": "/nix/store/s3ypwp4gcy05402m90lrv45qpc7g1mx4-ko-0.18.0",
               "default": true
             }
           ],
-          "store_path": "/nix/store/zmigwvsdw2lnj8xzw9pk4szrs4cy0cb5-ko-0.17.1"
+          "store_path": "/nix/store/s3ypwp4gcy05402m90lrv45qpc7g1mx4-ko-0.18.0"
         },
         "x86_64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/hdd0bhkf61jxpv46ggs462f219xpn8sz-ko-0.17.1",
+              "path": "/nix/store/x24ihwxpy90a75pr5miz9znk338mw3di-ko-0.18.0",
               "default": true
             }
           ],
-          "store_path": "/nix/store/hdd0bhkf61jxpv46ggs462f219xpn8sz-ko-0.17.1"
+          "store_path": "/nix/store/x24ihwxpy90a75pr5miz9znk338mw3di-ko-0.18.0"
         }
       }
     },
