@@ -7,6 +7,6 @@ require github.com/orcaman/concurrent-map/v2 v2.0.1
 require github.com/olahol/melody v1.2.1
 
 require (
-	github.com/go-chi/chi/v5 v5.2.1
+	github.com/go-chi/chi/v5 v5.2.2
 	github.com/gorilla/websocket v1.5.0 // indirect
 )
