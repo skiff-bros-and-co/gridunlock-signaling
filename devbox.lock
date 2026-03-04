@@ -101,51 +101,51 @@
         }
       }
     },
-    "reflex@0.3.1": {
-      "last_modified": "2026-02-23T15:40:43Z",
-      "resolved": "github:NixOS/nixpkgs/80d901ec0377e19ac3f7bb8c035201e2e098cc97#reflex",
+    "reflex@0.3.2": {
+      "last_modified": "2026-03-01T09:58:01Z",
+      "resolved": "github:NixOS/nixpkgs/42bbf3e1e000963f4f3f37daa822c67c4d8856c4#reflex",
       "source": "devbox-search",
-      "version": "0.3.1",
+      "version": "0.3.2",
       "systems": {
         "aarch64-darwin": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/9kqwphp95hrrv40ayh2hpmzwpi31pwbm-reflex-0.3.1",
+              "path": "/nix/store/vw4va7yzwk3x202mfsffhk5j5vlp032a-reflex-0.3.2",
               "default": true
             }
           ],
-          "store_path": "/nix/store/9kqwphp95hrrv40ayh2hpmzwpi31pwbm-reflex-0.3.1"
+          "store_path": "/nix/store/vw4va7yzwk3x202mfsffhk5j5vlp032a-reflex-0.3.2"
         },
         "aarch64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/vqni6ph30sfs649fxigd14r8h3zsms9w-reflex-0.3.1",
+              "path": "/nix/store/bbnksjccrxi58z7l6d0hqhzhfbilq7n9-reflex-0.3.2",
               "default": true
             }
           ],
-          "store_path": "/nix/store/vqni6ph30sfs649fxigd14r8h3zsms9w-reflex-0.3.1"
+          "store_path": "/nix/store/bbnksjccrxi58z7l6d0hqhzhfbilq7n9-reflex-0.3.2"
         },
         "x86_64-darwin": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/d79f2cq52310hq7dm2d5y70xa2plwhr0-reflex-0.3.1",
+              "path": "/nix/store/x6jyb5fv3rb6drmrawhndpwi2dygmbdn-reflex-0.3.2",
               "default": true
             }
           ],
-          "store_path": "/nix/store/d79f2cq52310hq7dm2d5y70xa2plwhr0-reflex-0.3.1"
+          "store_path": "/nix/store/x6jyb5fv3rb6drmrawhndpwi2dygmbdn-reflex-0.3.2"
         },
         "x86_64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/5m10ladhlc77ix1a50qfs4qnn35xawyx-reflex-0.3.1",
+              "path": "/nix/store/rqqpra0pw2zr4y31cy3cvwm39lkzsnwa-reflex-0.3.2",
               "default": true
             }
           ],
-          "store_path": "/nix/store/5m10ladhlc77ix1a50qfs4qnn35xawyx-reflex-0.3.1"
+          "store_path": "/nix/store/rqqpra0pw2zr4y31cy3cvwm39lkzsnwa-reflex-0.3.2"
         }
       }
     }
