@@ -43,51 +43,51 @@
         }
       }
     },
-    "ko@0.19.0": {
-      "last_modified": "2026-06-30T12:14:11Z",
-      "resolved": "github:NixOS/nixpkgs/e52c192be9d7b2c4bd4aed326c8731b35f8bb75c#ko",
+    "ko@0.19.1": {
+      "last_modified": "2026-08-12T11:28:58Z",
+      "resolved": "github:NixOS/nixpkgs/044bfe75bfe4c7bbe043dc17b5e42ea823b84a09#ko",
       "source": "devbox-search",
-      "version": "0.19.0",
+      "version": "0.19.1",
       "systems": {
         "aarch64-darwin": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/a7gllydsghiaip0sklgcq73lprxhi2vk-ko-0.19.0",
+              "path": "/nix/store/p3162qgkgx3iynij02pzkad1dpy4mpjc-ko-0.19.1",
               "default": true
             }
           ],
-          "store_path": "/nix/store/a7gllydsghiaip0sklgcq73lprxhi2vk-ko-0.19.0"
+          "store_path": "/nix/store/p3162qgkgx3iynij02pzkad1dpy4mpjc-ko-0.19.1"
         },
         "aarch64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/yd5biriznfwxzkvqnbfsdiphvzmzipy2-ko-0.19.0",
+              "path": "/nix/store/gdpf5slhwfqj3q684gi5qnmly4p32f3m-ko-0.19.1",
               "default": true
             }
           ],
-          "store_path": "/nix/store/yd5biriznfwxzkvqnbfsdiphvzmzipy2-ko-0.19.0"
+          "store_path": "/nix/store/gdpf5slhwfqj3q684gi5qnmly4p32f3m-ko-0.19.1"
         },
         "x86_64-darwin": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/20l2sn8ixxxf86b81h2fgwjfdy8l7fxz-ko-0.19.0",
+              "path": "/nix/store/1f5j1chicqia1cz9ycgjbd25pbmc61as-ko-0.19.1",
               "default": true
             }
           ],
-          "store_path": "/nix/store/20l2sn8ixxxf86b81h2fgwjfdy8l7fxz-ko-0.19.0"
+          "store_path": "/nix/store/1f5j1chicqia1cz9ycgjbd25pbmc61as-ko-0.19.1"
         },
         "x86_64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/i694nrrk67q04npawk82f1a6c2hwi42m-ko-0.19.0",
+              "path": "/nix/store/2809nqqmnz6525g0glhxi324b67dkl5m-ko-0.19.1",
               "default": true
             }
           ],
-          "store_path": "/nix/store/i694nrrk67q04npawk82f1a6c2hwi42m-ko-0.19.0"
+          "store_path": "/nix/store/2809nqqmnz6525g0glhxi324b67dkl5m-ko-0.19.1"
         }
       }
     },
