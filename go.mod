@@ -8,5 +8,5 @@ require github.com/olahol/melody v1.4.0
 
 require (
 	github.com/go-chi/chi/v5 v5.3.2
-	github.com/gorilla/websocket v1.5.0 // indirect
+	github.com/gorilla/websocket v1.5.3 // indirect
 )
