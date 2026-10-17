@@ -2,8 +2,8 @@
   "lockfile_version": "1",
   "packages": {
     "github:NixOS/nixpkgs/nixpkgs-unstable": {
-      "last_modified": "2026-09-07T01:55:52Z",
-      "resolved": "github:NixOS/nixpkgs/42f17a57f4f6e33b3de3dca0a2a5ea5233169d02?lastModified=1788746152&narHash=sha256-RaKngusl5I8pNi8RfrVvsHq3NZe7eFWzDlb01%2BhEVqY%3D"
+      "last_modified": "2026-10-16T02:15:57Z",
+      "resolved": "github:NixOS/nixpkgs/f20cd90e28fe0403873f473b29e42662cd86e8c4?lastModified=1792116957&narHash=sha256-EjZqHKObBfIOeHZnMRVV87HB3pPq%2FWBkmRJWyFxmZu8%3D"
     },
     "go@1.27.2": {
       "last_modified": "2026-10-10T12:58:50Z",
@@ -92,8 +92,8 @@
       }
     },
     "reflex@0.3.2": {
-      "last_modified": "2026-08-27T07:16:00Z",
-      "resolved": "github:NixOS/nixpkgs/c27cdad491a991b11ed731760aa2ef8db0cb0410#reflex",
+      "last_modified": "2026-10-14T08:20:44Z",
+      "resolved": "github:NixOS/nixpkgs/319e4cebef10cbb636c6ea392137b52ad105336a#reflex",
       "source": "devbox-search",
       "version": "0.3.2",
       "systems": {
@@ -101,21 +101,21 @@
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/g3k0k3szynny5b32idyan7yigx533z5x-reflex-0.3.2",
+              "path": "/nix/store/vma8karg45gkw6j3xgcl90ag07yciand-reflex-0.3.2",
               "default": true
             }
           ],
-          "store_path": "/nix/store/g3k0k3szynny5b32idyan7yigx533z5x-reflex-0.3.2"
+          "store_path": "/nix/store/vma8karg45gkw6j3xgcl90ag07yciand-reflex-0.3.2"
         },
         "aarch64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/cgjfbbdp6ih6q2dndjphm7i8krnldy0g-reflex-0.3.2",
+              "path": "/nix/store/lp9qbc9kvjiwcgy500nhwds97xkpfb6f-reflex-0.3.2",
               "default": true
             }
           ],
-          "store_path": "/nix/store/cgjfbbdp6ih6q2dndjphm7i8krnldy0g-reflex-0.3.2"
+          "store_path": "/nix/store/lp9qbc9kvjiwcgy500nhwds97xkpfb6f-reflex-0.3.2"
         },
         "x86_64-darwin": {
           "outputs": [
@@ -131,11 +131,11 @@
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/0vycd3fjhv9ixvnkwjk01alwpllmdj3m-reflex-0.3.2",
+              "path": "/nix/store/nw72vbz5syfhypb1si1bnxb5n6bwhb1p-reflex-0.3.2",
               "default": true
             }
           ],
-          "store_path": "/nix/store/0vycd3fjhv9ixvnkwjk01alwpllmdj3m-reflex-0.3.2"
+          "store_path": "/nix/store/nw72vbz5syfhypb1si1bnxb5n6bwhb1p-reflex-0.3.2"
         }
       }
     }
